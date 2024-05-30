@@ -1,0 +1,45 @@
+# Import necessary libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from keras.models import Sequential
+from keras.layers import Dense, LSTM
+
+# Load the stock data
+data = pd.read_csv('stock_data.csv')
+
+# Preprocess the data
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled_data = scaler.fit_transform(data['Close'].values.reshape(-1, 1))
+
+# Split the data into training and testing sets
+train_size = int(len(scaled_data) * 0.8)
+train_data = scaled_data[:train_size]
+test_data = scaled_data[train_size:]
+
+# Create the LSTM model
+model = Sequential()
+model.add(LSTM(units=50, return_sequences=True, input_shape=(1, 1)))
+model.add(LSTM(units=50))
+model.add(Dense(units=1))
+model.compile(optimizer='adam', loss='mean_squared_error')
+
+# Train the model
+model.fit(train_data, train_data, epochs=100, batch_size=32, verbose=1)
+
+# Make predictions
+test_predictions = model.predict(test_data)
+
+# Inverse transform the predictions
+test_predictions = scaler.inverse_transform(test_predictions)
+
+# Plot the results
+plt.figure(figsize=(12, 6))
+plt.plot(data.index[train_size:], data['Close'][train_size:], label='Actual')
+plt.plot(data.index[train_size:], test_predictions, label='Predicted')
+plt.title('Stock Price Prediction')
+plt.xlabel('Date')
+plt.ylabel('Price')
+plt.legend()
+plt.show()
