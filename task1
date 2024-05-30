@@ -1,0 +1,44 @@
+import numpy as np
+
+def assess_survival_likelihood(socioeconomic_status, age, gender, has_safety_gear, proximity_to_rescue, swimming_ability, environmental_conditions):
+    """
+    Assesses the likelihood of a person being saved from sinking based on various factors.
+    
+    Parameters:
+    socioeconomic_status (int): 1 (low), 2 (middle), 3 (high)
+    age (int): Age of the person in years
+    gender (str): 'male' or 'female'
+    has_safety_gear (bool): True if the person has access to safety gear, False otherwise
+    proximity_to_rescue (int): 1 (remote), 2 (moderate), 3 (close)
+    swimming_ability (int): 1 (poor), 2 (average), 3 (strong)
+    environmental_conditions (int): 1 (harsh), 2 (moderate), 3 (favorable)
+    
+    Returns:
+    float: Likelihood of being saved from sinking, ranging from 0 (low) to 1 (high)
+    """
+    # Assign weights to each factor
+    factor_weights = {
+        'socioeconomic_status': 0.2,
+        'age': 0.1,
+        'gender': 0.05,
+        'has_safety_gear': 0.3,
+        'proximity_to_rescue': 0.2,
+        'swimming_ability': 0.1,
+        'environmental_conditions': 0.05
+    }
+
+    # Normalize factor values to a scale of 0 to 1
+    normalized_factors = {
+        'socioeconomic_status': (socioeconomic_status - 1) / 2,
+        'age': (100 - age) / 100,
+        'gender': 0.5 if gender == 'male' else 0.6,
+        'has_safety_gear': 1 if has_safety_gear else 0,
+        'proximity_to_rescue': (proximity_to_rescue - 1) / 2,
+        'swimming_ability': (swimming_ability - 1) / 2,
+        'environmental_conditions': (environmental_conditions - 1) / 2
+    }
+
+    # Calculate the weighted sum of the normalized factors
+    likelihood_of_survival = sum(normalized_factors[factor] * factor_weights[factor] for factor in factor_weights)
+
+    return likelihood_of_survival
